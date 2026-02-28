@@ -1,70 +1,126 @@
-# Getting Started with Create React App
+# Medical Summarizer
+### AI-Powered Medical Discussion Summariser
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> An AI feature that helps busy physicians cut through long medical discussion threads. Understand an entire clinical discussion in under 30 seconds.
 
-## Available Scripts
+Built with **React** and the **Anthropic Claude API**.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## The Problem
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Medical discussion forums routinely generate 40–70 replies from physicians across different specialties. The most valuable insight is rarely the first reply — it might be a specialist's comment buried in reply 34, sitting between unrelated follow-ups, easy to miss, hard to find.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Doctors don't have 15 minutes to read an entire thread between patients. In most fields, missing a forum post means missing an opinion. In medicine, an overlooked comment from a specialist can directly affect patient care.
 
-### `npm test`
+## The Solution
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Two levels of AI summarisation:
 
-### `npm run build`
+- **Summarise Discussion** — one click turns the entire thread into a structured summary: TL;DR, consensus points, action items, and notable expert opinions
+- **Per-comment TL;DR** — hover any comment to get a one-sentence summary of what that specific doctor is saying
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Tech Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- React
+- Anthropic Claude API (`claude-3-5-sonnet`)
+- Prompt engineering for structured JSON clinical output
+- No backend — runs entirely in the browser (prototype)
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**1. Clone the repo**
+```bash
+git clone https://github.com/shreya-ree/medical-summarizer.git
+cd medical-summarizer
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**2. Install dependencies**
+```bash
+npm install
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+**3. Add your Anthropic API key**
 
-## Learn More
+Open `src/App.js`, find the `callClaude` function, and add your key to the headers:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```js
+headers: {
+  "Content-Type": "application/json",
+  "x-api-key": "YOUR_CLAUDE_API_KEY_HERE",
+  "anthropic-version": "2023-06-01",
+  "anthropic-dangerous-direct-browser-access": "true",
+},
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Get your key from [console.anthropic.com](https://console.anthropic.com) → API Keys.
 
-### Code Splitting
+**4. Run the app**
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Opens at `http://localhost:3000`
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## How the AI Summarisation Works
 
-### Making a Progressive Web App
+The discussion is passed to Claude with a system prompt instructing it to respond in strict JSON. The UI parses this and renders each component distinctly.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+**Full discussion:**
+```json
+{
+  "tldr": "One sentence clinical bottom line",
+  "consensus": ["Point 1", "Point 2"],
+  "keyInsights": [{ "author": "Dr. Name", "insight": "brief insight" }],
+  "actionItems": ["Action 1", "Action 2"]
+}
+```
 
-### Advanced Configuration
+**Single comment:**
+```json
+{
+  "summary": "2-3 sentence summary",
+  "keyPoint": "The single most important takeaway"
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## Known Limitations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- API key is exposed client-side — a backend proxy is required for production
+- Discussion data is hardcoded — free-text input for pasting real discussions is the next priority
 
-### `npm run build` fails to minify
+## What's Next
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Free-text input to paste any discussion from any platform
+- Specialty-aware weighting, relevant specialists flagged more prominently
+- Confidence score based on how many physicians agreed
+- Backend proxy to secure the API key
+- Ensure no patient-identifiable information is ever sent to the model
+
+---
+
+## Screenshots
+
+**Discussion view**
+
+<img src="./public/screenshots/discussion.png" width="500"/>
+
+**Per-comment AI Summary**
+
+<img src="./public/screenshots/comment-summary.png" width="500"/>
+
+**Full AI Summary**
+
+<img src="./public/screenshots/full-summary.png" width="500"/>
+
+---
+
+> ⚠️ **Disclaimer:** This tool summarises peer discussions and does not provide medical advice. It is a productivity aid for licensed physicians, not a clinical decision support system. No patient data should be entered into this tool.
