@@ -105,7 +105,7 @@ export default function MedicalSummarizer() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": "sk-ant-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",
+        "x-api-key": "YOUR_API_KEY_HERE",
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true",
       },
